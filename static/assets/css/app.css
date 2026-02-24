@@ -123,7 +123,8 @@ nav button {
 
 input {
   padding: 20px;
-  width: 40%;
+  width: 500px;
+  max-width: 90vw;
   background-color: rgba(10, 25, 47, 0.5);
   color: #e0faff;
   outline: none;
@@ -133,7 +134,7 @@ input {
   text-align: center;
   border-radius: 15px;
   position: relative;
-  transition: all 0.3s ease;
+  transition: width 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
   opacity: 100%;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(10px);
@@ -143,8 +144,7 @@ input {
 input:focus,
 .browse-input:focus {
   width: 700px;
-  padding-left: 60px;
-  text-align: left;
+  max-width: 95vw;
   border-color: rgba(0, 229, 255, 0.8);
   box-shadow: 0 0 20px rgba(0, 229, 255, 0.3), 0px 8px 16px 0px rgba(0, 0, 0, 0.5);
   background-color: rgba(10, 25, 47, 0.7);
@@ -308,10 +308,9 @@ a i {
     display: none;
   }
 
+  input:focus,
   .browse-input:focus {
-    width: 50%;
-    padding-left: 15px;
-    text-align: left;
+    width: 90vw;
   }
 }
 
