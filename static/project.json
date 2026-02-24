@@ -1,0 +1,9 @@
+{
+  "name": "math-punch",
+  "version": "1.0.0",
+  "description": "Math Punch - A modern web proxy",
+  "origin": "https://github.com/shuttlenetwork/math-punch.git",
+  "scripts": {
+    "start": "serve ."
+  }
+}

@@ -1,0 +1,61 @@
+.context-menu {
+  display: none;
+  font-family: poppins;
+  position: fixed;
+  background-color: rgba(10, 25, 47, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  min-width: 200px;
+  color: #e0faff;
+  font-weight: lighter;
+  box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(0, 255, 255, 0.15);
+  padding: 8px;
+  border-radius: 12px;
+  z-index: 1;
+  top: 0;
+  left: 0;
+}
+
+.context-menu-item {
+  cursor: pointer;
+  font-family: poppins;
+  padding: 8px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+  transition: .2s;
+}
+
+.context-menu-item:not(:last-child) {
+  border-bottom: 1px solid rgb(143, 143, 143)7e;
+}
+
+.context-menu-item:hover {
+  background-color: rgba(0, 229, 255, 0.15);
+  color: #fff;
+  box-shadow: inset 2px 0 0 0 rgba(0, 229, 255, 0.8);
+}
+
+.context-submenu {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 100%;
+  font-family: poppins;
+  min-width: 200px;
+  font-weight: lighter;
+  background-color: rgba(10, 25, 47, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 255, 255, 0.15);
+  box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.6);
+  padding: 8px;
+  border-radius: 12px;
+  z-index: 1;
+}
+
+.submenu-separator {
+  border-bottom: 1px solid rgb(207, 207, 207)7e;
+  background-color: red;
+  margin: 4px 0;
+}

@@ -1,0 +1,49 @@
+{
+  "Gaming Portals & Apps": [
+    {
+      "name": "Arctic 1.0 Games (WORKING)",
+      "imageUrl": "/assets/img/google-icon.webp",
+      "url": "window.location.href='/arcticmathworkgxmes.html'"
+    },
+    {
+      "name": "Five Nights At Freddys 1 (WORKING)",
+      "imageUrl": "/assets/img/discord.webp",
+      "url": "openAg('https://arcticmathfivenightsatfreddys1.vercel.app')"
+    },
+    {
+      "name": "Five Nights At Freddys 2 (WORKING)",
+      "imageUrl": "/assets/img/twitter-x.webp",
+      "url": "openAg('https://arcticmathfivenightsatfreddys2.vercel.app')"
+    },
+    {
+      "name": "FIve Nights At Freddys 3 (WORKING)",
+      "imageUrl": "/assets/img/reddit.webp",
+      "url": "openAg('https://arcticmathfivenightsatfreddys3.vercel.app')"
+    },
+    {
+      "name": "Shuttle Math (BEST OPTION FOR GAMING)",
+      "imageUrl": "/assets/img/coolmathgames.webp",
+      "url": "openAg('https://shuttlemath.com')"
+    },
+    {
+      "name": "CrazyGames (KINDA BROKEN)",
+      "imageUrl": "/assets/img/crazygames.webp",
+      "url": "openAg('https://crazygames.com')"
+    },
+    {
+      "name": "Y8 Games (WORKING)",
+      "imageUrl": "/assets/img/y8.webp",
+      "url": "openAg('https://y8.com')"
+    },
+    {
+      "name": "GeForce Now (NOT WORKING)",
+      "imageUrl": "/assets/img/geforcenow.webp",
+      "url": "openAg('https://play.geforcenow.com')"
+    },
+    {
+      "name": "nowgg.fun (WORKING)",
+      "imageUrl": "/assets/img/nowgg.webp",
+      "url": "openAg('https://nowgg.fun')"
+    }
+  ]
+}
