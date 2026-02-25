@@ -8,4 +8,6 @@ self.__uv$config = {
     bundle: '/uv/uv.bundle.js',
     config: '/uv/uv.config.js',
     sw: '/uv/uv.sw.js',
+    // ADD THIS LINE BELOW
+    transport: '/lib/bare.js', 
 };
