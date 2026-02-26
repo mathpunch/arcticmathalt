@@ -25,10 +25,14 @@ const uv = new UVServiceWorker();
 
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        return cache.addAll(urlsToCache.map(url => new Request(url, {cache: 'reload'})));
-      })
+    caches.open(CACHE_NAME).then(cache => {
+      // Cache in parallel with individual catch so one failure doesnt block others
+      return Promise.all(
+        urlsToCache.map(url =>
+          cache.add(new Request(url, { cache: 'reload' })).catch(() => {})
+        )
+      );
+    })
   );
   self.skipWaiting();
 });
@@ -37,11 +41,9 @@ self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
-        })
+        cacheNames
+          .filter(cacheName => cacheName !== CACHE_NAME)
+          .map(cacheName => caches.delete(cacheName))
       );
     })
   );
@@ -49,28 +51,34 @@ self.addEventListener('activate', event => {
 });
 
 async function handleRequest(event) {
+  // UV handles proxy routes first
   if (uv.route(event)) {
     return await uv.fetch(event);
   }
 
+  // Serve from cache immediately if available
   const cachedResponse = await caches.match(event.request);
-  if (cachedResponse) {
-    return cachedResponse;
-  }
+  if (cachedResponse) return cachedResponse;
 
   try {
     const response = await fetch(event.request);
-    
+
+    // Only cache valid same-origin responses
     if (response && response.status === 200 && response.type === 'basic') {
       const responseToCache = response.clone();
+      // Non-blocking cache write so it doesnt delay the response
       caches.open(CACHE_NAME).then(cache => {
         cache.put(event.request, responseToCache);
       });
     }
-    
+
     return response;
-  } catch (error) {
-    return await fetch(event.request);
+  } catch {
+    // If network fails and nothing is cached, return offline fallback
+    return new Response('Offline - please check your connection.', {
+      status: 503,
+      headers: { 'Content-Type': 'text/plain' }
+    });
   }
 }
 
