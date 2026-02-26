@@ -163,23 +163,33 @@
   <script src="/assets/js/anym.js?v=3"></script>
   <script src="/assets/js/main.js?v=3"></script>
 
+  <script src="/baremux/index.js"></script>
+  <script src="/epoxy/index.js"></script>
   <script src="/uv/uv.bundle.js"></script>
   <script src="/uv/uv.config.js"></script>
+
   <script>
-    // Register Service Worker
-    async function registerSW() {
+    // Register Service Worker and Transport
+    async function initProxy() {
       if ('serviceWorker' in navigator) {
         try {
           await navigator.serviceWorker.register('/sw.js', {
             scope: __uv$config.prefix
           });
-          console.log("Ultraviolet Service Worker registered successfully.");
+          
+          // Initialize Transport to prevent "WebSocket did not open" error
+          const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
+          if (!(await connection.getTransport())) {
+              await connection.setTransport("/epoxy/index.mjs", [{ wisp: __uv$config.wisp }]);
+          }
+          
+          console.log("Ultraviolet and Transport registered successfully.");
         } catch (err) {
-          console.error("Ultraviolet Service Worker registration failed:", err);
+          console.error("Registration failed:", err);
         }
       }
     }
-    registerSW();
+    initProxy();
 
     // Handle Search Bar Redirect
     const form = document.getElementById('uform');
@@ -216,7 +226,7 @@
       loadingScreen.style.display = 'none';
     }
 
-    // Quote Logic: Prevents repeats on refresh
+    // Quote Logic
     const quotesDisabled = localStorage.getItem('quotesDisabled') === 'true';
     if (!quotesDisabled) {
       const textOptions = [
