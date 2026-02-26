@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="noindex">
   <link rel="icon" href="/assets/img/salyte.jpg" />
@@ -95,13 +96,37 @@
     <iframe src="" id="siteurl" title="tab1" class="first" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-orientation-lock allow-modals allow-top-navigation allow-downloads"></iframe>
   </div>
 
+  <script src="/uv/uv.bundle.js"></script>
+  <script src="/uv/uv.config.js"></script>
   <script src="/baremux/index.js?v=3"></script>
+
+  <script>
+    // CRITICAL: Register the Service Worker in the loader context
+    async function initProxy() {
+        if ('serviceWorker' in navigator) {
+            try {
+                await navigator.serviceWorker.register('/sw.js', {
+                    scope: __uv$config.prefix
+                });
+                console.log("Loader: UV Service Worker Registered");
+            } catch (err) {
+                console.error("Loader: SW Registration Failed", err);
+            }
+        }
+    }
+    initProxy();
+  </script>
+
   <script src="/wk/wk2.js?v=3"></script>
   <script src="/assets/js/themes.js?v=3"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="/assets/js/loader.js?v=3"></script>
   <script src="/assets/js/tabs.js?v=3"></script>
-  <script>startInterval();</script>
+  <script>
+    // Initialize icons and search interval
+    lucide.createIcons();
+    startInterval();
+  </script>
 
   <script>
     if (localStorage.getItem('loadingScreenDisabled') === 'true') {
