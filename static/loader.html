@@ -1,64 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="noindex">
-  <link rel="icon" id="icon" href="/assets/img/salyte.jpg">
-  <link rel="stylesheet" href="/assets/css/app.css?v=3">
+  <link rel="icon" href="/assets/img/salyte.jpg" />
+  <link rel="stylesheet" href="/assets/css/ubar.css?v=3" />
+  <link rel="stylesheet" href="/assets/css/tabs.css?v=3" />
+  <script src="/assets/js/cdn-rocket.js?v=3"></script>
   <script src="/assets/js/anym.js?v=3"></script>
-  <script id="aclib" type="text/javascript" src="//acscdn.com/script/aclib.js"></script>
-  <script type="text/javascript">
-    aclib.runAutoTag({
-        zoneId: '9hyzsih444',
-    });
-  </script>
-  <title>Classroom</title>
-  <style>
-  .spinner {
-    width: 60px;
-    height: 60px;
-    border: 8px solid #FFF;
-    border-bottom-color: transparent;
-    border-radius: 50%;
-    display: inline-block;
-    box-sizing: border-box;
-    animation: rotation 1s linear infinite;
-  }
-
-  @keyframes rotation {
-    0% {
-      transform: rotate(0deg);
-    }
-
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-  </style>
+  <title>Portal | Salyte</title>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-HWLK0PZVBM"></script>
+  <script src="/assets/js/preload.js?v=3"></script>
   <script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-HWLK0PZVBM');</script>
-  <script src="/assets/js/param.js?v=3"></script>
 </head>
 <body>
-  <br>
-  <div class="themesExcluded" style="justify-content: center;align-items: center;display: flex;height: 50vh;">
-    <br>
-    <span class="spinner"></span>
+  <div id="urlBar">
+    <button class="btn btn-sm btn-ghost btn-circle" onclick="back()"><i data-lucide="chevron-left"></i></button>
+    <button class="btn btn-sm btn-ghost btn-circle" onclick="forward()"><i data-lucide="chevron-right"></i></button>
+    <button class="btn btn-sm btn-ghost btn-circle" onclick="reload()"><i data-lucide="rotate-cw" class="icon"></i></button>
+    <input type="text" placeholder="Search Google or type a URL" class="input searchBar" id="searchBar" style="outline:none;" />
+    <i data-lucide="search" class="search" style="width:15px;left:133px;color:rgb(140,148,160);"></i>
+    <button class="btn btn-sm btn-ghost btn-circle" id="tabs"><i data-lucide="folder" class="icon"></i></button>
+    <button class="btn btn-sm btn-ghost btn-circle" onclick="openWindow()"><i data-lucide="square-arrow-out-up-right" class="icon"></i></button>
+    <button class="btn btn-sm btn-ghost btn-circle" id="more"><i data-lucide="menu" class="icon"></i></button>
   </div>
-  <script src="/assets/js/themes.js?v=3"></script>
-  <script>
-  var nav = document.querySelectorAll('nav');
-  nav.forEach(function(navElement) {
-    navElement.style.transition = '1s';
-    navElement.style.backgroundColor = 'rgba(255, 251, 0, 0)';
-    navElement.style.border = '1px solid transparent';
-    navElement.style.boxShadow = '0 0 8px transparent';
-    navElement.style.opacity = '100%';
-  });
-  </script>
+  <div id="menu">
+    <button class="btn btn-sm" onclick="exit()" style="margin-top:-46px;"><i data-lucide="house" class="icon" style="width:17px;"></i>Return</button>
+    <button class="btn btn-sm" onclick="hideBar()"><i data-lucide="eye-off" class="icon"></i>Hide Bar</button>
+    <button class="btn btn-sm" onclick="toggleFs()"><i data-lucide="minimize" class="icon"></i>Fullscreen</button>
+    <button class="btn btn-sm" onclick="devTools()"><i data-lucide="terminal" class="icon"></i>DevTools</button>
+  </div>
+  <div id="sidebar">
+    <button class="btn btn-sm btn-ghost btn-circle" onclick="createIframe()" style="position:absolute;margin-top:-45px;left:9px;"><i data-lucide="plus"></i></button>
+    <button class="btn btn-sm btn-ghost btn-circle" onclick="toggleSidebar()" style="position:absolute;margin-top:-45px;right:9px;"><i data-lucide="x"></i></button>
+    <div id="tabList" class="tab-buttons themesExcluded"></div>
+  </div>
+  <div class="iframe-container" id="iframe-container">
+    <iframe src="loading.html" id="loader" title="Loading.." style="display:block"></iframe>
+    <iframe src="" id="siteurl" title="tab1" class="first" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-orientation-lock allow-modals allow-top-navigation allow-downloads"></iframe>
+  </div>
+  <script src="/baremux/index.js?v=3"></script>
   <script src="/wk/wk2.js?v=3"></script>
-  <script src="/wk/wk3.js?v=3"></script>
-  <script src="/assets/js/main.js?v=3"></script>
-<!--<script type='text/javascript' src='//cogentselfish.com/a1/87/68/a187684b9f023e7b2684450a755b623e.js'></script>-->
+  <script src="/assets/js/themes.js?v=3"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="/assets/js/loader.js?v=3"></script>
+  <script src="/assets/js/tabs.js?v=3"></script>
+  <script>
+    startInterval();
+  </script>
 </body>
 </html>
