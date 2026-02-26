@@ -1,7 +1,5 @@
 self.__uv$config = {
     prefix: '/service/',
-    bare: '/seal/',
-    wisp: (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/wisp/',
     encodeUrl: Ultraviolet.codec.xor.encode,
     decodeUrl: Ultraviolet.codec.xor.decode,
     handler: '/uv/uv.handler.js',
