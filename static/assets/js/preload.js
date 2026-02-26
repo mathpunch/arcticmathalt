@@ -20,9 +20,10 @@ window.onload = function() {
 			if (location.protocol !== "https:" && !swAllowedHostnames.includes(location.hostname)) throw new Error("Service workers cannot be registered without https.");
 			throw new Error("Your browser doesn't support service workers.");
 		}
-		await connection.setTransport("/epoxy/index.mjs", [{
-			wisp: wispUrl
-		}]);
+		
+		// Updated transport line below
+		await connection.setTransport("/baremod/index.mjs", ["/bare/"]);
+
 		await window.navigator.serviceWorker.register("/sw.js", {
 			scope: '/service/',
 		});
