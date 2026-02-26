@@ -3,7 +3,10 @@ window.onload = function() {
 	const vercelCheck = localStorage.getItem('isVercel');
 	const swAllowedHostnames = ["localhost", "127.0.0.1"];
 	const wispUrl = (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + "/wisp/";
-	const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
+	
+	// Uses your local uv bundle for the connection logic
+	const connection = new BareMux.BareMuxConnection("/uv/uv.bundle.js");
+
 	function isMobile() {
 		let details = navigator.userAgent;
 		let regexp = /android|iphone|kindle|ipad/i;
@@ -21,8 +24,8 @@ window.onload = function() {
 			throw new Error("Your browser doesn't support service workers.");
 		}
 		
-		// Updated transport line below
-		await connection.setTransport("/baremod/index.mjs", ["/bare/"]);
+		// Updated to point to your actual bundle and the '/seal/' endpoint from your config
+		await connection.setTransport("/uv/uv.bundle.js", ["/seal/"]);
 
 		await window.navigator.serviceWorker.register("/sw.js", {
 			scope: '/service/',
