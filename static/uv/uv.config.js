@@ -1,5 +1,7 @@
+/* static/uv/uv.config.js */
 self.__uv$config = {
     prefix: '/service/',
+    bare: '/seal/',
     encodeUrl: Ultraviolet.codec.xor.encode,
     decodeUrl: Ultraviolet.codec.xor.decode,
     handler: '/uv/uv.handler.js',
