@@ -163,53 +163,6 @@
   <script src="/assets/js/anym.js?v=3"></script>
   <script src="/assets/js/main.js?v=3"></script>
 
-  <script src="/baremux/index.js"></script>
-  <script src="/epoxy/index.js"></script>
-  <script src="/uv/uv.bundle.js"></script>
-  <script src="/uv/uv.config.js"></script>
-
-  <script>
-    // Register Service Worker and Transport
-    async function initProxy() {
-      if ('serviceWorker' in navigator) {
-        try {
-          await navigator.serviceWorker.register('/sw.js', {
-            scope: __uv$config.prefix
-          });
-          
-          // Initialize Transport to prevent "WebSocket did not open" error
-          const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
-          if (!(await connection.getTransport())) {
-              await connection.setTransport("/epoxy/index.mjs", [{ wisp: __uv$config.wisp }]);
-          }
-          
-          console.log("Ultraviolet and Transport registered successfully.");
-        } catch (err) {
-          console.error("Registration failed:", err);
-        }
-      }
-    }
-    initProxy();
-
-    // Handle Search Bar Redirect
-    const form = document.getElementById('uform');
-    const input = document.getElementById('name');
-
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      const url = input.value.trim();
-      let destination;
-
-      if (url.includes('.') && !url.includes(' ')) {
-        destination = url.startsWith('http') ? url : 'http://' + url;
-      } else {
-        destination = 'https://www.google.com/search?q=' + encodeURIComponent(url);
-      }
-
-      window.location.href = __uv$config.prefix + __uv$config.encodeUrl(destination);
-    });
-  </script>
-
   <script>
     const loadingScreen = document.getElementById('loading-screen');
     const isDisabled = localStorage.getItem('loadingScreenDisabled') === 'true';
@@ -226,7 +179,7 @@
       loadingScreen.style.display = 'none';
     }
 
-    // Quote Logic
+    // Quote Logic: Prevents repeats on refresh
     const quotesDisabled = localStorage.getItem('quotesDisabled') === 'true';
     if (!quotesDisabled) {
       const textOptions = [
@@ -254,6 +207,7 @@
       let lastIndex = localStorage.getItem('lastQuoteIndex');
       let newIndex;
 
+      // Force a different quote if the list has more than one item
       do {
         newIndex = Math.floor(Math.random() * textOptions.length);
       } while (newIndex == lastIndex && textOptions.length > 1);
