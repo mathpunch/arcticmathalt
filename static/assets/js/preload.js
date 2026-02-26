@@ -2,23 +2,19 @@ window.onload = function() {
 	let scope;
 	const vercelCheck = localStorage.getItem('isVercel');
 	const swAllowedHostnames = ["localhost", "127.0.0.1"];
+	// The wispUrl remains for potential future use, but we are prioritizing Bare transport
 	const wispUrl = (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + "/wisp/";
 	
 	/**
-	 * FIX: Changed from /baremux/worker.js to /uv/uv.bundle.js
-	 * This addresses the 404 error and the "Dead Port" ping error.
+	 * FIX: Points the connection to your UV bundle.
+	 * This resolves the 404 for /worker.js and the "Dead Port" timeout.
 	 */
 	const connection = new BareMux.BareMuxConnection("/uv/uv.bundle.js");
 
 	function isMobile() {
 		let details = navigator.userAgent;
 		let regexp = /android|iphone|kindle|ipad/i;
-		let isMobileDevice = regexp.test(details);
-		if (isMobileDevice) {
-		 return true;
-		} else {
-			return false;
-		}
+		return !!regexp.test(details);
 	}
 
 	async function registerSW() {
@@ -28,7 +24,7 @@ window.onload = function() {
 		}
 		
 		/**
-		 * Using the bundle as the transport and /seal/ as the endpoint 
+		 * Set transport to use the UV bundle logic and the /seal/ bare endpoint
 		 * as defined in your uv.config.js
 		 */
 		await connection.setTransport("/uv/uv.bundle.js", ["/seal/"]);
@@ -39,6 +35,7 @@ window.onload = function() {
 		await window.navigator.serviceWorker.register("/lab.js", {
 			scope: '/assignments/',
 		});
+
 		async function fetchDomains() {
 			const response = await fetch('/data/b-list.json');
 			const data = await response.json();
@@ -49,6 +46,7 @@ window.onload = function() {
 			const escapedDomains = domains.map(domain => domain.replace(/\./g, '\\.'));
 			return new RegExp(escapedDomains.join('|') + '(?=[/\\s]|$)', 'i');
 		}
+
 		const domains = await fetchDomains();
 		const domainRegex = createDomainRegex(domains);
 		const searchValue = Ultraviolet.codec.xor.decode(localStorage.getItem("encodedUrl"));
@@ -69,7 +67,8 @@ window.onload = function() {
 		encodedUrl = scope + encodedUrl;
 		document.querySelector("#siteurl").src = encodedUrl;
 	}
-	/* CK */
+
+	/* CK Logic */
 	function rndAbcString(length) {
 		const characters = "abcdefghijklmnopqrstuvw0123456789012345";
 		let result = "";
@@ -78,10 +77,12 @@ window.onload = function() {
 		}
 		return result;
 	}
+
 	var randomAlphanumericString = rndAbcString(7);
 	var url = "/mastery?auth=" + randomAlphanumericString;
 	var title = "Google Docs";
 	history.pushState({}, title, url);
+	
 	registerSW();
-	live();
+	if (typeof live === "function") live();
 };
