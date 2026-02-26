@@ -9,8 +9,14 @@
   <link rel="icon" id="icon" href="/assets/img/salyte.jpg">
   <link rel="stylesheet" href="/assets/css/app.css?v=3">
   <link rel="stylesheet" href="/assets/css/menu.css?v=3">
+  
+  <script src="/uv/uv.bundle.js?v=3"></script>
+  <script src="/uv/uv.config.js?v=3"></script>
+  <script src="/assets/js/preload.js?v=3"></script>
+
   <script rel="preload" src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js?v=3"></script>
   <script src="/assets/js/particles.js?v=3"></script>
+  
   <title>Arctic 1.0</title>
 
   <style>
@@ -207,7 +213,6 @@
       let lastIndex = localStorage.getItem('lastQuoteIndex');
       let newIndex;
 
-      // Force a different quote if the list has more than one item
       do {
         newIndex = Math.floor(Math.random() * textOptions.length);
       } while (newIndex == lastIndex && textOptions.length > 1);
