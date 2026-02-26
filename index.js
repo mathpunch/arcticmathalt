@@ -17,17 +17,17 @@ const server = http.createServer();
 const app = express();
 const bareServer = createBareServer('/seal/');
 
-// Middleware for parsing and serving your static folder
+// Middleware for parsing and static files
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'static')));
 
-// Serve the internal UV/Bare/Epoxy files from node_modules
+// Serve UV and transport libraries
 app.use("/uv/", express.static(uvPath));
 app.use("/epoxy/", express.static(epoxyPath));
 app.use("/baremux/", express.static(baremuxPath));
 
-// Defined Page Routes
+// Page Routes
 const routes = [
   { route: '/mastery', file: './static/loader.html' },
   { route: '/apps', file: './static/apps.html' },
@@ -45,12 +45,12 @@ routes.forEach(({ route, file }) => {
 
 app.get('/student', (req, res) => res.redirect('/mastery'));
 
-// 404 Handler
+// 404 Catch-all
 app.use((req, res) => {
   res.status(404).sendFile(path.join(__dirname, './static/404.html'));
 });
 
-// Routing for Bare Server
+// Handle HTTP requests (Bare + Express)
 server.on("request", (req, res) => {
   if (bareServer.shouldRoute(req)) {
     bareServer.routeRequest(req, res);
@@ -59,11 +59,11 @@ server.on("request", (req, res) => {
   }
 });
 
-// Routing for Wisp (WebSockets)
+// Handle WebSocket Upgrades (Bare + Wisp)
 server.on("upgrade", (req, socket, head) => {
   if (bareServer.shouldRoute(req)) {
     bareServer.routeUpgrade(req, socket, head);
-  } else if (req.url.startsWith("/wisp")) {
+  } else if (req.url.startsWith("/wisp/")) {
     wisp.routeRequest(req, socket, head);
   } else {
     socket.end();
