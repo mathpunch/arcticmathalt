@@ -1,8 +1,6 @@
-/* static/uv/uv.config.js */
 self.__uv$config = {
     prefix: '/service/',
     bare: '/seal/',
-    // This line solves the "Wisp WebSocket failed" error
     wisp: (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/wisp/',
     encodeUrl: Ultraviolet.codec.xor.encode,
     decodeUrl: Ultraviolet.codec.xor.decode,
