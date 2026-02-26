@@ -5,7 +5,7 @@ import { epoxyPath } from "@mercuryworkshop/epoxy-transport";
 import { baremuxPath } from "@mercuryworkshop/bare-mux/node";
 import { createBareServer } from "@tomphttp/bare-server-node";
 import { uvPath } from "@titaniumnetwork-dev/ultraviolet";
-import wisp from "wisp-server-node";
+import { server as wisp } from "@mercuryworkshop/wisp-js/server";
 import request from '@cypress/request';
 import chalk from 'chalk';
 import packageJson from './package.json' with { type: 'json' };
@@ -16,6 +16,7 @@ const bareServer = createBareServer('/seal/');
 const app = express(server);
 const version = packageJson.version;
 const discord = 'https://discord.gg/unblocking';
+
 const routes = [
   { route: '/mastery', file: './static/loader.html' },
   { route: '/apps', file: './static/apps.html' },
@@ -47,16 +48,14 @@ app.get('/student', (req, res) => {
   res.redirect('/portal');
 });
 
+// FIXED: Removed broken worker.js mirror route
+// If you need this worker, create a local worker.js file in /static/ folder
+// and uncomment the route below:
+/*
 app.get('/worker.js', (req, res) => {
-  request('https://worker.mirror.ftp.sh/worker.js', (error, response, body) => {
-    if (!error && response.statusCode === 200) {
-      res.setHeader('Content-Type', 'text/javascript');
-      res.send(body);
-    } else {
-      res.status(500).send('Error fetching worker script');
-    }
-  });
+  res.sendFile(path.join(__dirname, './static/worker.js'));
 });
+*/
 
 app.use((req, res) => {
   res.statusCode = 404;
@@ -72,13 +71,15 @@ server.on("request", (req, res) => {
 server.on("upgrade", (req, socket, head) => {
   if (bareServer.shouldRoute(req)) {
     bareServer.routeUpgrade(req, socket, head);
-  } else if (req.url.endsWith("/wisp/")) {
+  } else if (req.url.endsWith("/wisp/") || req.url.endsWith("/wisp")) {
     wisp.routeRequest(req, socket, head);
-  } else socket.end();
+  } else {
+    socket.end();
+  }
 });
 
 server.on('listening', () => {
-  console.log(chalk.bgBlue.white.bold(`  Welcome to Doge V4, user!  `) + '\n');
+  console.log(chalk.bgBlue.white.bold`  Welcome to Arctic 1.0, user!  ` + '\n');
   console.log(chalk.cyan('-----------------------------------------------'));
   console.log(chalk.green('  🌟 Status: ') + chalk.bold('Active'));
   console.log(chalk.green('  🌍 Port: ') + chalk.bold(chalk.yellow(server.address().port)));
@@ -92,7 +93,7 @@ server.on('listening', () => {
 });
 
 function shutdown(signal) {
-  console.log(chalk.bgRed.white.bold(`  Shutting Down (Signal: ${signal})  `) + '\n');
+  console.log(chalk.bgRed.white.bold`  Shutting Down (Signal: ${signal})  ` + '\n');
   console.log(chalk.red('-----------------------------------------------'));
   console.log(chalk.yellow('  🛑 Status: ') + chalk.bold('Shutting Down'));
   console.log(chalk.yellow('  🕒 Time: ') + chalk.bold(new Date().toLocaleTimeString()));
@@ -103,7 +104,6 @@ function shutdown(signal) {
 
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
-
 
 server.listen({
   port: 8001,
