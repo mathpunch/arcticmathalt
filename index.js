@@ -5,7 +5,7 @@ import { epoxyPath } from "@mercuryworkshop/epoxy-transport";
 import { baremuxPath } from "@mercuryworkshop/bare-mux/node";
 import { createBareServer } from "@tomphttp/bare-server-node";
 import { uvPath } from "@titaniumnetwork-dev/ultraviolet";
-import { server as wisp } from "@mercuryworkshop/wisp-js/server";
+import { server as wisp } from "@mercuryworkshop/wisp-js/server"; // Use the package you actually have installed
 import request from '@cypress/request';
 import chalk from 'chalk';
 import packageJson from './package.json' with { type: 'json' };
@@ -13,7 +13,7 @@ import packageJson from './package.json' with { type: 'json' };
 const __dirname = path.resolve();
 const server = http.createServer();
 const bareServer = createBareServer('/seal/');
-const app = express(server);
+const app = express(); // Standard initialization
 const version = packageJson.version;
 const discord = 'https://discord.gg/unblocking';
 
@@ -27,11 +27,7 @@ const routes = [
 ];
 
 app.use(express.json());
-app.use(
-  express.urlencoded({
-    extended: true,
-  })
-);
+app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static(path.join(__dirname, 'static')));
 app.use("/uv/", express.static(uvPath));
@@ -44,67 +40,43 @@ routes.forEach(({ route, file }) => {
   });
 });
 
-app.get('/student', (req, res) => {
-  res.redirect('/portal');
-});
+app.get('/student', (req, res) => res.redirect('/mastery'));
 
-// FIXED: Removed broken worker.js mirror route
-// If you need this worker, create a local worker.js file in /static/ folder
-// and uncomment the route below:
-/*
+// Robust worker fetching
 app.get('/worker.js', (req, res) => {
-  res.sendFile(path.join(__dirname, './static/worker.js'));
+  request('https://worker.mirror.ftp.sh/worker.js', (error, response, body) => {
+    if (!error && response.statusCode === 200) {
+      res.setHeader('Content-Type', 'text/javascript');
+      res.send(body);
+    } else {
+      // Fallback: If mirror is down, try to send a local one or a 404
+      res.status(404).send('Worker not found');
+    }
+  });
 });
-*/
 
 app.use((req, res) => {
-  res.statusCode = 404;
-  res.sendFile(path.join(__dirname, './static/404.html'));
+  res.status(404).sendFile(path.join(__dirname, './static/404.html'));
 });
 
 server.on("request", (req, res) => {
   if (bareServer.shouldRoute(req)) {
     bareServer.routeRequest(req, res);
-  } else app(req, res);
+  } else {
+    app(req, res);
+  }
 });
 
 server.on("upgrade", (req, socket, head) => {
   if (bareServer.shouldRoute(req)) {
     bareServer.routeUpgrade(req, socket, head);
-  } else if (req.url.endsWith("/wisp/") || req.url.endsWith("/wisp")) {
+  } else if (req.url.startsWith("/wisp")) { // Catch-all for desktop/mobile variations
     wisp.routeRequest(req, socket, head);
   } else {
     socket.end();
   }
 });
 
-server.on('listening', () => {
-  console.log(chalk.bgBlue.white.bold`  Welcome to Arctic 1.0, user!  ` + '\n');
-  console.log(chalk.cyan('-----------------------------------------------'));
-  console.log(chalk.green('  🌟 Status: ') + chalk.bold('Active'));
-  console.log(chalk.green('  🌍 Port: ') + chalk.bold(chalk.yellow(server.address().port)));
-  console.log(chalk.green('  🕒 Time: ') + chalk.bold(new Date().toLocaleTimeString()));
-  console.log(chalk.cyan('-----------------------------------------------'));
-  console.log(chalk.magenta('📦 Version: ') + chalk.bold(version));
-  console.log(chalk.magenta('🔗 URL: ') + chalk.underline('http://localhost:' + server.address().port));
-  console.log(chalk.cyan('-----------------------------------------------'));
-  console.log(chalk.blue('💬 Discord: ') + chalk.underline(discord));
-  console.log(chalk.cyan('-----------------------------------------------'));
-});
-
-function shutdown(signal) {
-  console.log(chalk.bgRed.white.bold`  Shutting Down (Signal: ${signal})  ` + '\n');
-  console.log(chalk.red('-----------------------------------------------'));
-  console.log(chalk.yellow('  🛑 Status: ') + chalk.bold('Shutting Down'));
-  console.log(chalk.yellow('  🕒 Time: ') + chalk.bold(new Date().toLocaleTimeString()));
-  console.log(chalk.red('-----------------------------------------------'));
-  console.log(chalk.blue('  Exiting immediately...'));
-  process.exit(1);
-}
-
-process.on('SIGTERM', () => shutdown('SIGTERM'));
-process.on('SIGINT', () => shutdown('SIGINT'));
-
-server.listen({
-  port: 8001,
+server.listen({ port: 8001 }, () => {
+  console.log(chalk.blue.bold(`Arctic 1.0 is online on port 8001`));
 });
