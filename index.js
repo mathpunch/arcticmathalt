@@ -7,27 +7,21 @@ import { createBareServer } from "@tomphttp/bare-server-node";
 import { uvPath } from "@titaniumnetwork-dev/ultraviolet";
 import { server as wisp } from "@mercuryworkshop/wisp-js/server";
 import chalk from 'chalk';
-import { createRequire } from 'module';
-
-const require = createRequire(import.meta.url);
-const packageJson = require('./package.json');
 
 const __dirname = path.resolve();
 const server = http.createServer();
 const app = express();
 const bareServer = createBareServer('/seal/');
 
-// Middleware for parsing and static files
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'static')));
-
-// Serve UV and transport libraries
 app.use("/uv/", express.static(uvPath));
 app.use("/epoxy/", express.static(epoxyPath));
 app.use("/baremux/", express.static(baremuxPath));
 
-// Page Routes
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Routing
 const routes = [
   { route: '/mastery', file: './static/loader.html' },
   { route: '/apps', file: './static/apps.html' },
@@ -45,12 +39,10 @@ routes.forEach(({ route, file }) => {
 
 app.get('/student', (req, res) => res.redirect('/mastery'));
 
-// 404 Catch-all
 app.use((req, res) => {
   res.status(404).sendFile(path.join(__dirname, './static/404.html'));
 });
 
-// Handle HTTP requests (Bare + Express)
 server.on("request", (req, res) => {
   if (bareServer.shouldRoute(req)) {
     bareServer.routeRequest(req, res);
@@ -59,7 +51,6 @@ server.on("request", (req, res) => {
   }
 });
 
-// Handle WebSocket Upgrades (Bare + Wisp)
 server.on("upgrade", (req, socket, head) => {
   if (bareServer.shouldRoute(req)) {
     bareServer.routeUpgrade(req, socket, head);
@@ -70,11 +61,7 @@ server.on("upgrade", (req, socket, head) => {
   }
 });
 
-const PORT = process.env.PORT || 8001;
-server.listen({ port: PORT }, () => {
-  console.log(chalk.cyan('-----------------------------------------------'));
-  console.log(chalk.green('  🌟 Arctic 1.0 Status: ') + chalk.bold('Active'));
-  console.log(chalk.green('  🌍 Port: ') + chalk.bold(PORT));
-  console.log(chalk.blue('  🔗 URL: ') + chalk.underline(`http://localhost:${PORT}`));
-  console.log(chalk.cyan('-----------------------------------------------'));
+const port = 8001;
+server.listen({ port }, () => {
+  console.log(chalk.green(`🚀 Arctic 1.0 running on http://localhost:${port}`));
 });
