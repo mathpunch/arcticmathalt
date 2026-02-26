@@ -4,7 +4,7 @@ window.onload = function() {
 	const swAllowedHostnames = ["localhost", "127.0.0.1"];
 	const wispUrl = (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + "/wisp/";
 	
-	// Points to the UV bundle which contains the BareMux logic
+	// Points to the UV bundle to initialize the BareMux worker
 	const connection = new BareMux.BareMuxConnection("/uv/uv.bundle.js");
 
 	function isMobile() {
@@ -19,10 +19,10 @@ window.onload = function() {
 			throw new Error("Your browser doesn't support service workers.");
 		}
 		
-		// Uses uv.bundle.js as transport and /seal/ as the endpoint
+		// Set transport to use the UV bundle and the /seal/ endpoint from uv.config.js
 		await connection.setTransport("/uv/uv.bundle.js", ["/seal/"]);
 
-		// Points to your sw.js inside the static folder
+		// Register Service Workers from the static root
 		await window.navigator.serviceWorker.register("/sw.js", {
 			scope: '/service/',
 		});
@@ -58,11 +58,14 @@ window.onload = function() {
 		}
 		
 		let encodedUrl = localStorage.getItem("encodedUrl");
-		encodedUrl = scope + encodedUrl;
-		document.querySelector("#siteurl").src = encodedUrl;
+		if (encodedUrl) {
+			encodedUrl = scope + encodedUrl;
+			const siteFrame = document.querySelector("#siteurl");
+			if (siteFrame) siteFrame.src = encodedUrl;
+		}
 	}
 
-	/* CK Logic */
+	/* Tab Cloaking / History Logic */
 	function rndAbcString(length) {
 		const characters = "abcdefghijklmnopqrstuvw0123456789012345";
 		let result = "";
