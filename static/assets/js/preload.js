@@ -4,7 +4,10 @@ window.onload = function() {
 	const swAllowedHostnames = ["localhost", "127.0.0.1"];
 	const wispUrl = (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + "/wisp/";
 	
-	// Uses your local uv bundle for the connection logic
+	/**
+	 * FIX: Changed from /baremux/worker.js to /uv/uv.bundle.js
+	 * This addresses the 404 error and the "Dead Port" ping error.
+	 */
 	const connection = new BareMux.BareMuxConnection("/uv/uv.bundle.js");
 
 	function isMobile() {
@@ -24,7 +27,10 @@ window.onload = function() {
 			throw new Error("Your browser doesn't support service workers.");
 		}
 		
-		// Updated to point to your actual bundle and the '/seal/' endpoint from your config
+		/**
+		 * Using the bundle as the transport and /seal/ as the endpoint 
+		 * as defined in your uv.config.js
+		 */
 		await connection.setTransport("/uv/uv.bundle.js", ["/seal/"]);
 
 		await window.navigator.serviceWorker.register("/sw.js", {
