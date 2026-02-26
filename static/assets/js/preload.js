@@ -2,13 +2,9 @@ window.onload = function() {
 	let scope;
 	const vercelCheck = localStorage.getItem('isVercel');
 	const swAllowedHostnames = ["localhost", "127.0.0.1"];
-	// The wispUrl remains for potential future use, but we are prioritizing Bare transport
 	const wispUrl = (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + "/wisp/";
 	
-	/**
-	 * FIX: Points the connection to your UV bundle.
-	 * This resolves the 404 for /worker.js and the "Dead Port" timeout.
-	 */
+	// Points to the UV bundle which contains the BareMux logic
 	const connection = new BareMux.BareMuxConnection("/uv/uv.bundle.js");
 
 	function isMobile() {
@@ -23,12 +19,10 @@ window.onload = function() {
 			throw new Error("Your browser doesn't support service workers.");
 		}
 		
-		/**
-		 * Set transport to use the UV bundle logic and the /seal/ bare endpoint
-		 * as defined in your uv.config.js
-		 */
+		// Uses uv.bundle.js as transport and /seal/ as the endpoint
 		await connection.setTransport("/uv/uv.bundle.js", ["/seal/"]);
 
+		// Points to your sw.js inside the static folder
 		await window.navigator.serviceWorker.register("/sw.js", {
 			scope: '/service/',
 		});
