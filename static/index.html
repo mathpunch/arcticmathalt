@@ -163,43 +163,6 @@
   <script src="/assets/js/anym.js?v=3"></script>
   <script src="/assets/js/main.js?v=3"></script>
 
-  <script src="/uv/uv.bundle.js"></script>
-  <script src="/uv/uv.config.js"></script>
-  <script>
-    // Register Service Worker
-    async function registerSW() {
-      if ('serviceWorker' in navigator) {
-        try {
-          await navigator.serviceWorker.register('/sw.js', {
-            scope: __uv$config.prefix
-          });
-          console.log("Ultraviolet Service Worker registered successfully.");
-        } catch (err) {
-          console.error("Ultraviolet Service Worker registration failed:", err);
-        }
-      }
-    }
-    registerSW();
-
-    // Handle Search Bar Redirect
-    const form = document.getElementById('uform');
-    const input = document.getElementById('name');
-
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      const url = input.value.trim();
-      let destination;
-
-      if (url.includes('.') && !url.includes(' ')) {
-        destination = url.startsWith('http') ? url : 'http://' + url;
-      } else {
-        destination = 'https://www.google.com/search?q=' + encodeURIComponent(url);
-      }
-
-      window.location.href = __uv$config.prefix + __uv$config.encodeUrl(destination);
-    });
-  </script>
-
   <script>
     const loadingScreen = document.getElementById('loading-screen');
     const isDisabled = localStorage.getItem('loadingScreenDisabled') === 'true';
@@ -244,6 +207,7 @@
       let lastIndex = localStorage.getItem('lastQuoteIndex');
       let newIndex;
 
+      // Force a different quote if the list has more than one item
       do {
         newIndex = Math.floor(Math.random() * textOptions.length);
       } while (newIndex == lastIndex && textOptions.length > 1);
