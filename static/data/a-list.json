@@ -28,7 +28,7 @@
   {
     "name": "YouTube (WORKING)",
     "imageUrl": "/assets/img/youtube.webp",
-    "url": "openAg('https://youtube.com')"
+    "url": "openAg('https://m.youtube.com/shorts/jQN4GlGbidU')"
   },
   {
     "name": "Netflix (I DONT KNOW IF IT WORKS)",
