@@ -1,1 +1,339 @@
-let devToolsLoaded,scope;const searchBar=document.querySelector(".input"),urlBar=document.querySelector("#urlBar"),sideBar=document.getElementById("sidebar"),menu=document.getElementById("menu"),frame=document.getElementById("siteurl"),selectedTheme=localStorage.getItem("selectedOption"),vercelCheck=localStorage.getItem("isVercel");var leaveConf=localStorage.getItem("leaveConfirmation");if("enabled"===leaveConf&&(window.onbeforeunload=function(e){const t="Are you sure you want to leave this page?";return(e||window.event).returnValue=t,t},setTimeout(()=>{console.log("onbeforeunload handler engaged after page load.")},500)),searchBar.value=Ultraviolet.codec.xor.decode(localStorage.getItem("encodedUrl")),lucide.createIcons(),themeStyles={deepsea:{background:"rgb(6, 22, 35)"},equinox:{backgroundImage:"url('/assets/img/topographic_splash.webp')"},swamp:{background:"rgb(12, 43, 22)"},starry:{background:"rgb(63, 3, 53)"},magma:{background:"rgb(31, 26, 26)"},sunset:{background:"rgb(29, 21, 27)"},midnight:{background:"rgb(27, 27, 27)"},default:{background:"rgb(6, 22, 35)"}},selectedStyle=themeStyles[selectedTheme]||themeStyles.default,selectedStyle.background&&(searchBar.style.background=selectedStyle.background),selectedStyle.backgroundImage&&(urlBar.style.backgroundImage=selectedStyle.backgroundImage),document.getElementById("tabs").addEventListener("click",function(){sideBar.style.display="block"===sideBar.style.display?"none":"block","block"===sideBar.style.display&&(menu.style.display="none")}),document.getElementById("more").addEventListener("click",function(){menu.style.display="block"===menu.style.display?"none":"block","block"===menu.style.display&&(sideBar.style.display="none")}),function fetchDomains(){return fetch("/data/b-list.json").then(e=>e.json()).then(e=>e.domains).catch(e=>(console.error("Error fetching domains:",e),[]))}function createDomainRegex(e){const t=e.map(e=>e.replace(/\./g,"\\."));return new RegExp(t.join("|")+"(?=[/\\s]|$)","i")}function forward(){frame.contentWindow.history.go(1)}function back(){frame.contentWindow.history.go(-1),setTimeout(()=>{const e=frame.contentWindow.location.pathname;"/loading.html"===e&&forward()},500)}function reload(){frame.contentWindow.location.reload()}function devTools(){var e=document.getElementById("siteurl");if(e){var t=e.contentDocument||e.contentWindow.document,n=t.getElementById("eruda");if(devToolsLoaded){n&&n.remove()}else if(!n){var r=t.createElement("script");r.src="//cdn.jsdelivr.net/npm/eruda",r.onload=function(){var e=t.createElement("script");e.innerHTML="eruda.init();eruda.show();",t.head.appendChild(e)},t.head.appendChild(r)}devToolsLoaded=!devToolsLoaded}}function openWindow(){var e=window.open();e.document.body.style.margin="0",e.document.body.style.height="100vh";var t=e.document.createElement("iframe");t.style.border="none",t.style.width="100%",t.style.height="100%",t.style.margin="0",t.src="https://"+window.location.hostname+scope+Ultraviolet.codec.xor.encode(document.getElementById("searchBar").value),e.document.body.appendChild(t)}function exit(){location.href="/"}function hideBar(){["menu","sideBar","urlBar"].forEach(e=>{var t=document.getElementById(e);t&&(t.style.display="none",document.querySelectorAll("iframe").forEach(e=>{e.style.height="calc(100vh)"}))})}function decode(e){if("about:blank"===e||"welcome.html"===e)return"";if("welcome.html"===e||"https://"+location.hostname+"/welcome.html")return"";var t=["/service/","/assignments/"];let n=null;for(let r of t){const i=e.indexOf(r);if(-1!==i){const s=e.substring(i+r.length);try{n=Ultraviolet.codec.xor.decode(s);break}catch(a){return console.error("Error decoding the URL part:",a),null}}}return n}function updateSearch(){var e=decode(document.getElementById("siteurl").src);document.querySelector(".searchBar").value=e}function startInterval(){let e;function t(){e=setInterval(()=>{searchBar.value=decode(document.getElementById("siteurl").contentWindow.location.href)},1e3)}searchBar.addEventListener("focus",()=>{clearInterval(e)}),searchBar.addEventListener("blur",t),t()}function onFrameClick(){document.getElementById("siteurl").contentWindow&&(document.getElementById("siteurl").contentWindow.addEventListener("click",frameClicked),document.getElementById("siteurl").contentWindow.addEventListener("touchend",frameClicked))}function frameClicked(){sideBar.style.display="none",menu.style.display="none"}function home(){location.href="/"}function toggleFs(){document.fullscreenElement||(document.getElementById("siteurl").requestFullscreen(),menu.style.display="none")}function handleOpen(e){const t=window.open("about:blank","_blank");return t?(t.document.open(),t.document.write(`\n      <!DOCTYPE html>\n      <html>\n      <head>\n        <title>Arctic 1.0</title>\n        <link rel="icon" href="https://www.genesisedu.com/wp-content/uploads/2020/10/favicon.jpg" />\n        <style>\n          body { margin: 0; height: 100vh; }\n          iframe { border: none; width: 100%; height: 100%; margin: 0; }\n        </style>\n      </head>\n      <body>\n        <iframe src="${"https://"+window.location.hostname+"/assignments/"+Ultraviolet.codec.xor.encode(e)}" sandbox="allow-same-origin allow-scripts allow-forms allow-pointer-lock allow-modal[...]">\n      </body>\n      </html>\n    `),t.document.close()):console.error("Failed to open Genesis Quick Login!"),null}function getWindow(){let e=window;for(;e.parent&&e!==e.parent;)if(e=e.parent,"function"==typeof e.handleOpen)return e;return window}function interceptFrame(){frame.contentWindow&&(frame.contentWindow.open=function(e,t){return handleOpen(e),null},frame.contentWindow.document.addEventListener("click",e=>{const t=e.target;if("A"===t.tagName){const n=t.getAttribute("target");if("_top"===n||"_blank"===n){e.preventDefault();const r=t.getAttribute("href");if(r){getWindow().handleOpen(r)}}}}),frame.contentWindow.addEventListener("submit",e=>{e.preventDefault()}))}function isUrl(e=""){return/^http(s?):\/\//.test(e)||e.includes(".")&&" "!==e.substr(0,1)}searchBar.addEventListener("keydown",function(e){if("Enter"===e.key){var t=searchBar.value.trim();searchBar.blur(),fetch("/data/b-list.json").then(e=>e.json()).then(e=>e.domains).catch(e=>(console.error("Error fetching domains:",e),[])).then(n=>{const r=createDomainRegex(n),i=searchBar.value.trim();"true"!==vercelCheck?scope=r.test(i)?"/assignments/":"/service/":scope="/assignments/";let s;s=isUrl(t)?t.startsWith("https://")||t.startsWith("http://")?t:"http://"+t:"https://duckduckgo.com/?t=h_&ia=web&q="+encodeURIComponent(t),document.getElementById("siteurl").src=scope+Ultraviolet.codec.xor.encode(s)})}}),setTimeout(function(){var e=document.getElementById("searchBar").value;e.startsWith("https://")?localStorage.setItem("encodedUrl",Ultraviolet.codec.xor.encode(e)):console.log("Blank URL, not saving")},6e4),frame.addEventListener("load",interceptFrame),document.addEventListener("DOMContentLoaded",function(){onFrameClick(),setInterval(onFrameClick,1e3)});
+let devToolsLoaded;
+let scope;
+const searchBar = document.querySelector(".input");
+const urlBar = document.querySelector('#urlBar');
+const sideBar = document.getElementById("sidebar");
+const menu = document.getElementById('menu');
+const frame = document.getElementById('siteurl');
+const selectedTheme = localStorage.getItem('selectedOption');
+const vercelCheck = localStorage.getItem('isVercel');
+var leaveConf = localStorage.getItem("leaveConfirmation");
+
+if (leaveConf === "enabled") {
+    window.onbeforeunload = function (e) {
+        const confirmationMessage = "Are you sure you want to leave this page?";
+        (e || window.event).returnValue = confirmationMessage;
+        return confirmationMessage;
+    };
+
+    setTimeout(() => {
+        console.log('onbeforeunload handler engaged after page load.');
+    }, 500);
+}
+
+searchBar.value = Ultraviolet.codec.xor.decode(localStorage.getItem('encodedUrl'));
+lucide.createIcons();
+
+const themeStyles = {
+  deepsea: { background: "rgb(6, 22, 35)" },
+  equinox: { backgroundImage: "url('/assets/img/topographic_splash.webp')" },
+  swamp: { background: "rgb(12, 43, 22)" },
+  starry: { background: "rgb(63, 3, 53)" },
+  magma: { background: "rgb(31, 26, 26)" },
+  sunset: { background: "rgb(29, 21, 27)" },
+  midnight: { background: "rgb(27, 27, 27)" },
+  default: { background: "rgb(6, 22, 35)" }
+};
+
+const selectedStyle = themeStyles[selectedTheme] || themeStyles.default;
+if (selectedStyle.background) {
+  searchBar.style.background = selectedStyle.background;
+}
+if (selectedStyle.backgroundImage) {
+  urlBar.style.backgroundImage = selectedStyle.backgroundImage;
+}
+
+document.getElementById('tabs').addEventListener('click', function() {
+  sideBar.style.display = sideBar.style.display === "block" ? "none" : "block";
+  if (sideBar.style.display === 'block') {
+    menu.style.display = 'none';
+  }
+});
+document.getElementById('more').addEventListener('click', function() {
+	menu.style.display = menu.style.display === "block" ? "none" : "block";
+	if (menu.style.display === 'block') {
+		sideBar.style.display = 'none';
+	}
+});
+
+function fetchDomains() {
+	return fetch('/data/b-list.json').then(response => response.json()).then(data => data.domains).catch(error => {
+		console.error('Error fetching domains:', error);
+		return []; // Adds a promise so scope can work
+	});
+}
+
+function createDomainRegex(domains) {
+	const escapedDomains = domains.map(domain => domain.replace(/\./g, '\\.'));
+	return new RegExp(escapedDomains.join('|') + '(?=[/\\s]|$)', 'i');
+}
+
+searchBar.addEventListener("keydown", function(event) {
+	if (event.key === 'Enter') {
+		var inputUrl = searchBar.value.trim();
+		searchBar.blur();
+		fetchDomains().then(domains => {
+			const domainRegex = createDomainRegex(domains);
+			const searchValue = searchBar.value.trim();
+			if (vercelCheck !== 'true') {
+				if (domainRegex.test(searchValue)) {
+					scope = '/assignments/';
+				} else {
+					scope = '/service/';
+				}
+			} else {
+				scope = '/assignments/';
+				// serverless = no websocket support
+			}
+			let url;
+
+			if (!isUrl(inputUrl)) {
+				// Use DuckDuckGo search for non-URL input
+				url = "https://duckduckgo.com/?t=h_&ia=web&q=" + encodeURIComponent(inputUrl);
+			} else if (!(inputUrl.startsWith("https://") || inputUrl.startsWith("http://"))) {
+				// Handle URL without protocol
+				url = "http://" + inputUrl;
+			} else {
+				// Handle valid URL
+				url = inputUrl;
+			}
+
+			document.getElementById('siteurl').src = scope + Ultraviolet.codec.xor.encode(url);
+		});
+	}
+});
+
+setTimeout(function() {
+	var searchBarValue = document.getElementById('searchBar').value;
+	if (searchBarValue.startsWith('https://')) {
+		localStorage.setItem('encodedUrl', Ultraviolet.codec.xor.encode(searchBarValue));
+	} else {
+		// Blank URL, not saving
+	}
+}, 60000);
+// Save URL every 60 seconds
+function forward() {
+	frame.contentWindow.history.go(1);
+}
+
+function back() {
+	frame.contentWindow.history.go(-1);
+	setTimeout(() => {
+		const currentSrc = frame.contentWindow.location.pathname;
+		if (currentSrc === '/loading.html') {
+			forward();
+		}
+	}, 500);
+}
+
+function reload() {
+  frame.contentWindow.location.reload();
+}
+
+function devTools() {
+  var siteIframe = document.getElementById('siteurl');
+  if (siteIframe) {
+    var innerDoc = siteIframe.contentDocument || siteIframe.contentWindow.document;
+    var eruda = innerDoc.getElementById('eruda');
+    if (!devToolsLoaded) {
+      if (!eruda) {
+        var erudaScript = document.createElement('script');
+        erudaScript.src = "//cdn.jsdelivr.net/npm/eruda";
+        erudaScript.onload = function() {
+          var initScript = document.createElement('script');
+          initScript.innerHTML = "eruda.init();eruda.show();";
+          innerDoc.head.appendChild(initScript);
+        };
+        innerDoc.head.appendChild(erudaScript);
+      }
+    }
+    else {
+      if (eruda) {
+        eruda.remove();
+      }
+    }
+    devToolsLoaded = !devToolsLoaded;
+  }
+}
+
+function openWindow() {
+  var win = window.open();
+  win.document.body.style.margin = "0";
+  win.document.body.style.height = "100vh";
+  var iframe = win.document.createElement("iframe");
+  iframe.style.border = "none";
+  iframe.style.width = "100%";
+  iframe.style.height = "100%";
+  iframe.style.margin = "0";
+  iframe.src = 'https://' + window.location.hostname + scope + Ultraviolet.codec.xor.encode(document.getElementById('searchBar').value);
+  win.document.body.appendChild(iframe);
+}
+
+function exit() {
+  location.href = '/'
+}
+
+function hideBar() {
+  var elements = ["menu", "sideBar", "urlBar"];
+  elements.forEach(elementId => {
+    var element = document.getElementById(elementId);
+    if (element) {
+      element.style.display = 'none';
+      var allFrames = document.querySelectorAll('iframe');
+      allFrames.forEach(iframe => {
+        iframe.style.height = 'calc(100vh)';
+      });
+    }
+  });
+}
+
+function decode(url) {
+  if (url === 'about:blank' || url === 'welcome.html') {
+    return '';
+  }
+  else if (url === 'welcome.html' || url === 'https://' + location.hostname + '/welcome.html') {
+    return '';
+  }
+
+  var prefixes = ['/service/', '/assignments/'];
+  let decodedPart = null;
+
+  for (let prefix of prefixes) {
+    const uvIndex = url.indexOf(prefix);
+    if (uvIndex !== -1) {
+      const encodedPart = url.substring(uvIndex + prefix.length);
+      try {
+        decodedPart = Ultraviolet.codec.xor.decode(encodedPart);
+        break; // Exit the loop once we find a valid prefix
+      } catch (error) {
+        console.error('Error decoding the URL part:', error);
+        return null;
+      }
+    }
+  }
+  return decodedPart;
+}
+
+
+function updateSearch() {
+  var url = decode(document.getElementById('siteurl').src);
+  document.querySelector('.searchBar').value = url;
+}
+
+function startInterval() {
+  let intervalId;
+
+  function startLoop() {
+    intervalId = setInterval(() => {
+      searchBar.value = decode(document.getElementById("siteurl").contentWindow.location.href);
+    }, 1000);
+  }
+
+  function stopLoop() {
+    clearInterval(intervalId);
+  }
+  searchBar.addEventListener('focus', stopLoop);
+  searchBar.addEventListener('blur', startLoop);
+  startLoop();
+}
+
+function onFrameClick() {
+  if (document.getElementById('siteurl').contentWindow) {
+    document.getElementById('siteurl').contentWindow.addEventListener('click', frameClicked);
+    document.getElementById('siteurl').contentWindow.addEventListener('touchend', frameClicked);
+  }
+}
+
+function frameClicked() {
+  sideBar.style.display = 'none';
+  menu.style.display = 'none';
+}
+
+function home() {
+  location.href = '/';
+}
+
+function toggleFs() {
+  if (!document.fullscreenElement) {
+    document.getElementById('siteurl').requestFullscreen();
+    menu.style.display = 'none';
+  }
+}
+
+function handleOpen(url) {
+  const newWindow = window.open('about:blank', '_blank');
+  if (newWindow) {
+    newWindow.document.open();
+    newWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Arctic 1.0</title>
+        <link rel="icon" href="https://www.genesisedu.com/wp-content/uploads/2020/10/favicon.jpg" />
+        <style>
+          body { margin: 0; height: 100vh; }
+          iframe { border: none; width: 100%; height: 100%; margin: 0; }
+        </style>
+      </head>
+      <body>
+        <iframe src="${'https://' + window.location.hostname + '/assignments/' + Ultraviolet.codec.xor.encode(url)}" sandbox="allow-same-origin allow-scripts allow-forms allow-pointer-lock allow-modal[...]">
+      </body>
+      </html>
+    `);
+    newWindow.document.close();
+  } else {
+    console.error('Failed to open Genesis Quick Login!');
+  }
+
+  return null;
+}
+
+function getWindow() {
+  let currentWindow = window;
+  while (currentWindow.parent && currentWindow !== currentWindow.parent) {
+    currentWindow = currentWindow.parent;
+    if (typeof currentWindow.handleOpen === 'function') {
+      return currentWindow;
+    }
+  } // Derpman -  I did this because on about:blank the intercepting doesn't work, so this searches for the correct window
+  return window;
+}
+
+function interceptFrame() {
+  if (frame.contentWindow) {
+    frame.contentWindow.open = function(url, target) {
+      handleOpen(url);
+      return null;
+    };
+
+    frame.contentWindow.document.addEventListener('click', event => {
+      const target = event.target;
+      if (target.tagName === 'A') {
+        const targetAttr = target.getAttribute('target');
+        if (targetAttr === '_top' || targetAttr === '_blank') {
+          event.preventDefault();
+          const href = target.getAttribute('href');
+          if (href) {
+            const correctWindow = getWindow();
+            correctWindow.handleOpen(href);
+          }
+        }
+      }
+    });
+
+    frame.contentWindow.addEventListener('submit', event => {
+      event.preventDefault();
+    });
+  }
+}
+
+frame.addEventListener('load', interceptFrame);
+
+document.addEventListener('DOMContentLoaded', function() {
+  onFrameClick();
+  setInterval(onFrameClick, 1000);
+});
+
+function isUrl(val = "") {
+  return /^http(s?):\/\//.test(val) || (val.includes(".") && val.substr(0, 1) !== " ");
+}
