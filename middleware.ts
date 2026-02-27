@@ -23,6 +23,9 @@ const ALLOWED_BROWSERS = [
   'firefox',
   'edge',
   'opera',
+  'googlebot', // Added Google
+  'bingbot',   // Added Bing
+  'yandexbot'  // Added Yandex
 ];
 
 export function middleware(req: NextRequest) {
@@ -33,6 +36,16 @@ export function middleware(req: NextRequest) {
     return new Response('Blocked: No User-Agent', { status: 403 });
   }
 
+  // VIP Check: If it's a legitimate search engine, let them through immediately
+  const isSearchBot = ['googlebot', 'bingbot', 'slurp', 'duckduckbot', 'baiduspider'].some(bot => 
+    userAgent.includes(bot)
+  );
+
+  if (isSearchBot) {
+    return NextResponse.next();
+  }
+
+  // Standard blocked agent check
   for (const blockedAgent of BLOCKED_AGENTS) {
     if (userAgent.includes(blockedAgent.toLowerCase())) {
       return new Response('Blocked: Suspicious User-Agent', { status: 403 });
